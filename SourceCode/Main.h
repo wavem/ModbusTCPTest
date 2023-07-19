@@ -3,6 +3,9 @@
 #ifndef MainH
 #define MainH
 //---------------------------------------------------------------------------
+#include "Define.h"
+#include "SocketThread.h"
+//---------------------------------------------------------------------------
 #include <System.Classes.hpp>
 #include <Vcl.Controls.hpp>
 #include <Vcl.StdCtrls.hpp>
@@ -112,6 +115,9 @@ public: // DEFAULT FUNCTIONS
 	void __fastcall InitProgram();
     void __fastcall ExitProgram();
     void __fastcall PrintMsg(UnicodeString _str);
+
+public: // SOCKET
+	bool __fastcall InitSocket();
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFormMain *FormMain;

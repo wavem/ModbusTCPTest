@@ -87,6 +87,10 @@ void __fastcall TFormMain::FormClose(TObject *Sender, TCloseAction &Action)
 
 void __fastcall TFormMain::InitProgram() {
 
+	// Init Socket
+    InitSocket();
+
+
 
 	PrintMsg(L"Init Complete");
 }
@@ -94,12 +98,46 @@ void __fastcall TFormMain::InitProgram() {
 
 void __fastcall TFormMain::ExitProgram() {
 
+
+
+
+	// Socket Clean Up
+	WSACleanup();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::PrintMsg(UnicodeString _str) {
 	int t_Idx = memo->Lines->Add(_str);
     memo->SetCursor(0, t_Idx);
+}
+//---------------------------------------------------------------------------
+
+bool __fastcall TFormMain::InitSocket() {
+
+	// Common
+    UnicodeString tempStr = L"";
+
+	// SOCKET INIT
+    WSADATA data;
+	WORD version;
+	int ret = 0;
+
+	version = MAKEWORD(2, 2);
+	ret = WSAStartup(version, &data);
+	if(ret != 0) {
+		ret = WSAGetLastError();
+		if(ret == WSANOTINITIALISED) {
+			tempStr.sprintf(L"Socket not initialised (error code : %d)", ret);
+			PrintMsg(tempStr);
+		} else {
+			tempStr.sprintf(L"Socket error (error code : %d)", ret);
+			PrintMsg(tempStr);
+		}
+        return false;
+	} else {
+		PrintMsg(L"Socket init success");
+        return true;
+	}
 }
 //---------------------------------------------------------------------------
 

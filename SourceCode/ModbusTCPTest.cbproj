@@ -113,6 +113,10 @@
         <BCC_PCHName_Clang>ModbusTCPTestPCH1.h</BCC_PCHName_Clang>
     </PropertyGroup>
     <ItemGroup>
+        <CppCompile Include="Define.cpp">
+            <DependentOn>Define.h</DependentOn>
+            <BuildOrder>3</BuildOrder>
+        </CppCompile>
         <CppCompile Include="Main.cpp">
             <Form>FormMain</Form>
             <FormType>dfm</FormType>
@@ -125,6 +129,10 @@
         <PCHCompile Include="ModbusTCPTestPCH1.h">
             <BuildOrder>1</BuildOrder>
         </PCHCompile>
+        <CppCompile Include="SocketThread.cpp">
+            <DependentOn>SocketThread.h</DependentOn>
+            <BuildOrder>4</BuildOrder>
+        </CppCompile>
         <FormResources Include="Main.dfm"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
