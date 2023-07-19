@@ -75,6 +75,7 @@
 #include "AdvMemo.hpp"
 #include "AdvEdit.hpp"
 //---------------------------------------------------------------------------
+class CSocketThread;
 class TFormMain : public TForm
 {
 __published:	// IDE-managed Components
@@ -91,22 +92,26 @@ __published:	// IDE-managed Components
 	TLabel *Label1;
 	TLabel *Label2;
 	TLabel *Label3;
-	TAdvEdit *AdvEdit1;
+	TAdvEdit *ed_SendBuf_0;
 	TLabel *Label4;
-	TAdvEdit *AdvEdit2;
+	TAdvEdit *ed_SendBuf_1;
 	TLabel *Label5;
 	TLabel *Label6;
 	TLabel *Label7;
-	TAdvEdit *AdvEdit3;
-	TAdvEdit *AdvEdit4;
-	TAdvEdit *AdvEdit5;
-	TAdvEdit *AdvEdit6;
-	TAdvEdit *AdvEdit7;
-	TAdvEdit *AdvEdit8;
+	TAdvEdit *ed_SendBuf_2;
+	TAdvEdit *ed_SendBuf_3;
+	TAdvEdit *ed_SendBuf_5;
+	TAdvEdit *ed_SendBuf_4;
+	TAdvEdit *ed_SendBuf_6;
+	TAdvEdit *ed_SendBuf_7;
 	TLabel *Label8;
 	TLabel *Label9;
 	TLabel *Label10;
+	TdxBar *BarMgrBar2;
+	TdxBarLargeButton *MenuBtn_Send;
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
+	void __fastcall MenuBtn_ConnectClick(TObject *Sender);
+	void __fastcall MenuBtn_SendClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TFormMain(TComponent* Owner);
@@ -117,7 +122,28 @@ public: // DEFAULT FUNCTIONS
     void __fastcall PrintMsg(UnicodeString _str);
 
 public: // SOCKET
+	CSocketThread *m_pSocketThread;
+	SOCKET m_TCPSocket;
+    bool __fastcall CreateTCPSocket();
+    bool __fastcall CreateSocketThread();
 	bool __fastcall InitSocket();
+    BYTE m_SendBuf[SEND_BUF_SIZE];
+    BYTE m_RecvBuf[RECV_BUF_SIZE];
+    bool __fastcall SendPacket();
+    void __fastcall ExtractSendData();
+    bool __fastcall MakingCRC();
+
+
+
+public: // Message Handler
+	void __fastcall PrintThreadLogMessage(TMessage &_msg);
+	void __fastcall ReceiveServerData(TMessage &_msg);
+
+
+BEGIN_MESSAGE_MAP
+	MESSAGE_HANDLER(MSG_LOG_FROM_THREAD, TMessage, PrintThreadLogMessage)
+	MESSAGE_HANDLER(MSG_SERVER_DATA, TMessage, ReceiveServerData)
+END_MESSAGE_MAP(TForm)
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFormMain *FormMain;

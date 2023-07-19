@@ -2,8 +2,9 @@
 #ifndef SocketThreadH
 #define SocketThreadH
 //---------------------------------------------------------------------------
-#include "Define.h"
-#include <System.Classes.hpp>
+#include "Main.h"
+//#include "Define.h"
+//#include <System.Classes.hpp>
 
 enum ThreadWorkingType
 {
@@ -29,7 +30,7 @@ public: // Variables
 	bool isConnected;
 
 public: // Functions
-	__fastcall CSocketThread(SOCKET *p_sock, int _ID = 0);
+	__fastcall CSocketThread(SOCKET *p_sock);
 	__fastcall ~CSocketThread();
 	bool __fastcall Receive();
 	void __fastcall Execute();
