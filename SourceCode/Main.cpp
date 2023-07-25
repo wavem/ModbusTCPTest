@@ -129,6 +129,18 @@ void __fastcall TFormMain::PrintMsg(UnicodeString _str) {
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TFormMain::PrintSend(UnicodeString _str) {
+	int t_Idx = memo_Send->Lines->Add(_str);
+    memo_Send->SetCursor(0, t_Idx);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::PrintRecv(UnicodeString _str) {
+	int t_Idx = memo_Recv->Lines->Add(_str);
+    memo_Recv->SetCursor(0, t_Idx);
+}
+//---------------------------------------------------------------------------
+
 bool __fastcall TFormMain::InitSocket() {
 
 	// Common
@@ -214,23 +226,53 @@ void __fastcall TFormMain::PrintThreadLogMessage(TMessage &_msg) {
 	UnicodeString *p = NULL;
 	p = (UnicodeString*)t_wParam;
     if(p) tempStr = *p;
-	PrintMsg(tempStr);
+
+    if(t_lParam == 0x10) PrintMsg(tempStr);
+    if(t_lParam == 0x20) PrintRecv(tempStr);
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
-/*
+
+	//PrintMsg(L"RECVDATA!!!");
+
 	// Common
 	UnicodeString tempStr = L"";
+    UnicodeString t_OutputStr = L"";
 	unsigned int t_wParam = _msg.WParam;
 	int t_lParam = _msg.LParam;
-	SERVERDATA* p_serverData = NULL;
-	SERVERDATA t_serverData;
-	memset(&t_serverData, 0, sizeof(t_serverData));
+	//SERVERDATA* p_serverData = NULL;
+	//SERVERDATA t_serverData;
+	//memset(&t_serverData, 0, sizeof(t_serverData));
 	unsigned short t_RecvSize = 0;
-	BYTE t_DataType = 0;
-	int t_ClientIdx = 0;
-*/
+
+    int t_BodySize = t_lParam;
+
+    // Copy Stream
+    BYTE* p_Buffer = (BYTE*)t_wParam;
+    memcpy(m_RecvBuf, p_Buffer, t_lParam);
+
+    tempStr.sprintf(L"Recv Size : %d", t_lParam);
+    //PrintMsg(tempStr);
+
+    for(int i = 0 ; i < t_BodySize ; i++) {
+
+    	tempStr.sprintf(L"%02X ", m_RecvBuf[i]);
+    	t_OutputStr += tempStr;
+    }
+
+    PrintMsg(t_OutputStr);
+
+
+	// Receive Server Data
+//	p_serverData = (SERVERDATA*)t_wParam;
+//	t_serverData = *p_serverData;
+
+	// Logging Received Information
+//	memcpy(&t_RecvSize, &t_serverData.Data[1], 2);
+//	tempStr.sprintf(L"Received %04d byte from Server", t_RecvSize);
+//	PrintLog(tempStr);
+
 }
 //---------------------------------------------------------------------------
 
@@ -261,7 +303,7 @@ bool __fastcall TFormMain::MakingCRC() {
     // Test Code
     UnicodeString tempStr = L"";
     tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X", t_Buff[0], t_Buff[1], t_Buff[2], t_Buff[3], t_Buff[4], t_Buff[5]);
-    PrintMsg(tempStr);
+    //PrintMsg(tempStr);
 
 
     // CRC ROUTINE
@@ -284,38 +326,11 @@ bool __fastcall TFormMain::MakingCRC() {
 
     tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X %02X",
     				t_Buff[0], t_Buff[1], t_Buff[2], t_Buff[3], t_Buff[4], t_Buff[5], t_Buff[6], t_Buff[7]);
-    PrintMsg(tempStr);
+    //PrintMsg(tempStr);
 
     // Set Calculated CRC Value into Edit Control
     ed_SendBuf_6->IntValue = t_Buff[6];
     ed_SendBuf_7->IntValue = t_Buff[7];
-
-    return false;
-
-
-#if 0
-	unsigned short CRC16_1(unsigned char *puchMsg, int usDataLen)
-{
-	int i;
-	unsigned short crc, flag;
-
-	crc = 0xFFFF;
-
-	while(usDataLen--)
-	{
-		crc ^= *puchMsg++;
-
-		for (i=0; i<8; i++)
-		{
-			flag = crc & 0x0001;
-			crc >>= 1;
-			if(flag) crc ^= POLYNORMIAL;
-		}
-	}
-
-	return crc;
-}*/
-#endif
 
 	return true;
 }
@@ -323,22 +338,24 @@ bool __fastcall TFormMain::MakingCRC() {
 
 void __fastcall TFormMain::ExtractSendData() {
 
-
-
+	m_SendBuf[0] = ed_SendBuf_0->IntValue; // Des ID
+    m_SendBuf[1] = ed_SendBuf_1->IntValue; // F-Code
+    m_SendBuf[2] = ed_SendBuf_2->IntValue; // Start Add
+    m_SendBuf[3] = ed_SendBuf_3->IntValue;
+    m_SendBuf[4] = ed_SendBuf_4->IntValue; // Num of Pos
+    m_SendBuf[5] = ed_SendBuf_5->IntValue;
+    m_SendBuf[6] = ed_SendBuf_6->IntValue; // CRC
+    m_SendBuf[7] = ed_SendBuf_7->IntValue; // CRC
 }
 //---------------------------------------------------------------------------
 
 bool __fastcall TFormMain::SendPacket() {
 
-	// Making Room Routine
 	// Common
 	UnicodeString tempStr = L"";
 	int t_sendrst = 0;
-	BYTE t_TeamType = 0;
-	BYTE t_ItemType = 0;
-	int t_TextLen = 0;
 	UnicodeString t_RoomTitle = L"";
-	unsigned short t_PacketLen = 34;
+	unsigned short t_PacketLen = 8;
 
 	// Check Client Socket
 	if(m_TCPSocket == INVALID_SOCKET) {
@@ -364,15 +381,15 @@ bool __fastcall TFormMain::SendPacket() {
 	// Reset Send Buffer
 	memset(m_pSocketThread->sendBuff, 0, SEND_BUF_SIZE);
 
-    // Extract Information
-
 	// Set Data
-	m_pSocketThread->sendBuff[0] = 0x01; // Dst ID
-    m_pSocketThread->sendBuff[0] = 0x01; // Dst ID
-    m_pSocketThread->sendBuff[0] = 0x01; // Dst ID
-    m_pSocketThread->sendBuff[0] = 0x01; // Dst ID
-
-	//memcpy(&m_ClientThread->sendBuff[1], &t_PacketLen, 2);
+	m_pSocketThread->sendBuff[0] = m_SendBuf[0];
+    m_pSocketThread->sendBuff[1] = m_SendBuf[1];
+    m_pSocketThread->sendBuff[2] = m_SendBuf[2];
+    m_pSocketThread->sendBuff[3] = m_SendBuf[3];
+    m_pSocketThread->sendBuff[4] = m_SendBuf[4];
+    m_pSocketThread->sendBuff[5] = m_SendBuf[5];
+    m_pSocketThread->sendBuff[6] = m_SendBuf[6];
+    m_pSocketThread->sendBuff[7] = m_SendBuf[7];
 
 	// Send to Server
 	t_sendrst = send(m_TCPSocket, (char*)m_pSocketThread->sendBuff, t_PacketLen, 0);
@@ -380,6 +397,15 @@ bool __fastcall TFormMain::SendPacket() {
 	// Function End Routine
 	tempStr.sprintf(L"Send Byte : %d", t_sendrst);
 	PrintMsg(tempStr);
+
+    if(t_sendrst < 0) {
+    	PrintMsg(L"Fail to Send...");
+
+    } else {
+		tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X %02X",
+    				m_SendBuf[0], m_SendBuf[1], m_SendBuf[2], m_SendBuf[3], m_SendBuf[4], m_SendBuf[5], m_SendBuf[6], m_SendBuf[7]);
+    	PrintSend(tempStr);
+    }
 
 	return true;
 }

@@ -3,6 +3,7 @@
 #pragma hdrstop
 
 #include "SocketThread.h"
+#include "Main.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 
@@ -126,14 +127,63 @@ bool __fastcall CSocketThread::Receive() {
 	UnicodeString tempStr = L"";
 	int t_recvSize = 0;
 	int t_CurrentSize = 0;
-	BYTE t_SecureCode = 0;
 	unsigned short t_PacketSize = 0;
-	BYTE t_MessageType = 0;
 
-
-/*
 	// Reset Buffer
 	memset(recvBuff, 0, sizeof(recvBuff));
+
+    BYTE t_Header[7] = {0, };
+    t_recvSize = recv(*m_sock, (char*)&t_Header, 7, 0);
+
+    if(t_recvSize < 0) {
+    	tempStr = L"Fail to Receive Packet";
+        SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
+    	return false;
+    }
+
+
+
+    BYTE Des_ID = t_Header[0];
+    BYTE FCode = t_Header[1];
+    BYTE carID = t_Header[3];
+    unsigned short t_TotalCnt = 0;
+    memcpy(&t_TotalCnt, &t_Header[4], 2);
+    BYTE t_BodySize = t_Header[6];
+
+    //BYTE* t_BodyBuffer = new BYTE[t_BodySize];
+    memset(recvBuff, 0, sizeof(recvBuff));
+
+    t_recvSize = recv(*m_sock, (char*)&recvBuff, t_BodySize, 0);
+
+    if(t_recvSize < -1) {
+        tempStr = L"Fail to Receive Body Packet";
+        SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
+        return false;
+    }
+
+    unsigned short t_CRCValue = 0;
+    t_recvSize = recv(*m_sock, (char*)&t_CRCValue, 2, 0);
+    if(t_recvSize < -1) {
+    	tempStr = L"Fail to Receive CRC Value";
+        SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
+        return false;
+    }
+
+
+
+    SendMessage(FormMain->Handle, MSG_SERVER_DATA, (unsigned int)recvBuff, t_BodySize);
+
+
+
+
+	tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X ... (Total Size : %d)",
+    				t_Header[0], t_Header[1], t_Header[2], t_Header[3], t_Header[4], t_Header[5], t_Header[6], t_BodySize + 9);
+    SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x20);
+
+    //delete t_BodyBuffer;
+    return true;
+
+#if 0
 
 	// First Receive
 	t_recvSize = recv(*m_sock, (char*)&t_SecureCode, 1, 0);
@@ -174,12 +224,8 @@ bool __fastcall CSocketThread::Receive() {
 		t_CurrentSize += t_recvSize;
 	}
 
-
-*/
-
-
-
-	return true;
+#endif
+	// return true;
 }
 //---------------------------------------------------------------------------
 

@@ -27,7 +27,6 @@ object FormMain: TFormMain
     Color = 5000268
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 130
     object Label1: TLabel
       Left = 8
       Top = 445
@@ -264,7 +263,7 @@ object FormMain: TFormMain
         '')
       MarkerList.UseDefaultMarkerImageIndex = False
       MarkerList.DefaultMarkerImageIndex = -1
-      MarkerList.ImageTransparentColor = -1
+      MarkerList.ImageTransparentColor = 33554432
       OleDropTarget = []
       PrintOptions.MarginLeft = 0
       PrintOptions.MarginRight = 0
@@ -280,7 +279,7 @@ object FormMain: TFormMain
       SelBkColor = clNavy
       ShowRightMargin = False
       SmartTabs = False
-      TabOrder = 0
+      TabOrder = 8
       TabStop = True
       TrimTrailingSpaces = False
       UILanguage.ScrollHint = 'Row'
@@ -298,7 +297,7 @@ object FormMain: TFormMain
       Version = '3.4.1.0'
       WordWrap = wwNone
     end
-    object AdvMemo1: TAdvMemo
+    object memo_Send: TAdvMemo
       Left = 0
       Top = 464
       Width = 435
@@ -400,7 +399,7 @@ object FormMain: TFormMain
       SelBkColor = clNavy
       ShowRightMargin = False
       SmartTabs = False
-      TabOrder = 1
+      TabOrder = 9
       TabStop = True
       TrimTrailingSpaces = False
       UILanguage.ScrollHint = 'Row'
@@ -418,7 +417,7 @@ object FormMain: TFormMain
       Version = '3.4.1.0'
       WordWrap = wwNone
     end
-    object AdvMemo2: TAdvMemo
+    object memo_Recv: TAdvMemo
       Left = 433
       Top = 464
       Width = 650
@@ -520,7 +519,7 @@ object FormMain: TFormMain
       SelBkColor = clNavy
       ShowRightMargin = False
       SmartTabs = False
-      TabOrder = 2
+      TabOrder = 10
       TabStop = True
       TrimTrailingSpaces = False
       UILanguage.ScrollHint = 'Row'
@@ -567,7 +566,7 @@ object FormMain: TFormMain
       Font.Style = [fsBold]
       MaxLength = 2
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 0
       Text = '01'
       Visible = True
       Version = '3.3.5.3'
@@ -601,7 +600,7 @@ object FormMain: TFormMain
       Font.Style = [fsBold]
       MaxLength = 2
       ParentFont = False
-      TabOrder = 4
+      TabOrder = 1
       Text = '0'
       Visible = True
       Version = '3.3.5.3'
@@ -635,7 +634,7 @@ object FormMain: TFormMain
       Font.Style = [fsBold]
       MaxLength = 2
       ParentFont = False
-      TabOrder = 5
+      TabOrder = 2
       Text = '0'
       Visible = True
       Version = '3.3.5.3'
@@ -669,7 +668,7 @@ object FormMain: TFormMain
       Font.Style = [fsBold]
       MaxLength = 2
       ParentFont = False
-      TabOrder = 6
+      TabOrder = 3
       Text = '0'
       Visible = True
       Version = '3.3.5.3'
@@ -703,7 +702,7 @@ object FormMain: TFormMain
       Font.Style = [fsBold]
       MaxLength = 2
       ParentFont = False
-      TabOrder = 7
+      TabOrder = 5
       Text = '0'
       Visible = True
       Version = '3.3.5.3'
@@ -737,7 +736,7 @@ object FormMain: TFormMain
       Font.Style = [fsBold]
       MaxLength = 2
       ParentFont = False
-      TabOrder = 8
+      TabOrder = 4
       Text = '0'
       Visible = True
       Version = '3.3.5.3'
@@ -771,7 +770,7 @@ object FormMain: TFormMain
       Font.Style = [fsBold]
       MaxLength = 2
       ParentFont = False
-      TabOrder = 9
+      TabOrder = 6
       Text = '0'
       Visible = True
       Version = '3.3.5.3'
@@ -805,7 +804,7 @@ object FormMain: TFormMain
       Font.Style = [fsBold]
       MaxLength = 2
       ParentFont = False
-      TabOrder = 10
+      TabOrder = 7
       Text = '0'
       Visible = True
       Version = '3.3.5.3'
@@ -821,7 +820,6 @@ object FormMain: TFormMain
     Contexts = <>
     TabOrder = 1
     TabStop = False
-    ExplicitWidth = 645
     object RibbonMenuTab1: TdxRibbonTab
       Active = True
       Caption = 'Menu'
@@ -873,8 +871,8 @@ object FormMain: TFormMain
           Visible = True
           ItemName = 'MenuBtn_Disconnect'
         end>
-      OneOnRow = True
-      Row = 1
+      OneOnRow = False
+      Row = 0
       UseOwnFont = False
       Visible = True
       WholeRow = False
@@ -893,7 +891,7 @@ object FormMain: TFormMain
           Visible = True
           ItemName = 'MenuBtn_Send'
         end>
-      OneOnRow = True
+      OneOnRow = False
       Row = 0
       UseOwnFont = False
       Visible = True

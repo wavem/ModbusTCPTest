@@ -87,8 +87,8 @@ __published:	// IDE-managed Components
 	TdxBar *BarMgrBar1;
 	TdxBarLargeButton *MenuBtn_Connect;
 	TdxBarLargeButton *MenuBtn_Disconnect;
-	TAdvMemo *AdvMemo1;
-	TAdvMemo *AdvMemo2;
+	TAdvMemo *memo_Send;
+	TAdvMemo *memo_Recv;
 	TLabel *Label1;
 	TLabel *Label2;
 	TLabel *Label3;
@@ -120,6 +120,8 @@ public: // DEFAULT FUNCTIONS
 	void __fastcall InitProgram();
     void __fastcall ExitProgram();
     void __fastcall PrintMsg(UnicodeString _str);
+    void __fastcall PrintSend(UnicodeString _str);
+    void __fastcall PrintRecv(UnicodeString _str);
 
 public: // SOCKET
 	CSocketThread *m_pSocketThread;
@@ -139,7 +141,6 @@ public: // Message Handler
 	void __fastcall PrintThreadLogMessage(TMessage &_msg);
 	void __fastcall ReceiveServerData(TMessage &_msg);
 
-
 BEGIN_MESSAGE_MAP
 	MESSAGE_HANDLER(MSG_LOG_FROM_THREAD, TMessage, PrintThreadLogMessage)
 	MESSAGE_HANDLER(MSG_SERVER_DATA, TMessage, ReceiveServerData)
@@ -147,5 +148,8 @@ END_MESSAGE_MAP(TForm)
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFormMain *FormMain;
+
+
+
 //---------------------------------------------------------------------------
 #endif

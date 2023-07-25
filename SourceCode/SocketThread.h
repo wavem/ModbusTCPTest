@@ -2,9 +2,9 @@
 #ifndef SocketThreadH
 #define SocketThreadH
 //---------------------------------------------------------------------------
-#include "Main.h"
-//#include "Define.h"
-//#include <System.Classes.hpp>
+//#include "Main.h"
+#include "Define.h"
+#include <System.Classes.hpp>
 
 enum ThreadWorkingType
 {
