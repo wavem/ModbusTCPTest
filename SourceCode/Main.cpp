@@ -250,18 +250,25 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
 
     // Copy Stream
     BYTE* p_Buffer = (BYTE*)t_wParam;
-    memcpy(m_RecvBuf, p_Buffer, t_lParam);
+    memcpy(m_RecvBuf, p_Buffer, t_BodySize);
 
-    tempStr.sprintf(L"Recv Size : %d", t_lParam);
-    //PrintMsg(tempStr);
+    tempStr.sprintf(L"Packet Received (Size : %d)", t_lParam);
+    PrintMsg(tempStr);
 
-    for(int i = 0 ; i < t_BodySize ; i++) {
-
+    // Print Header
+    for(int i = 0 ; i < 7 ; i++) {
     	tempStr.sprintf(L"%02X ", m_RecvBuf[i]);
     	t_OutputStr += tempStr;
     }
+    PrintRecv(t_OutputStr);
 
-    PrintMsg(t_OutputStr);
+    // Print Body
+    t_OutputStr = L"";
+    for(int i = 7 ; i < t_BodySize - 7; i++) {
+    	tempStr.sprintf(L"%02X ", m_RecvBuf[i]);
+    	t_OutputStr += tempStr;
+    }
+    PrintRecv(t_OutputStr);
 
 
 	// Receive Server Data
@@ -410,4 +417,5 @@ bool __fastcall TFormMain::SendPacket() {
 	return true;
 }
 //---------------------------------------------------------------------------
+
 

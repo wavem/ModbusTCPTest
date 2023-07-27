@@ -109,6 +109,7 @@ __published:	// IDE-managed Components
 	TLabel *Label10;
 	TdxBar *BarMgrBar2;
 	TdxBarLargeButton *MenuBtn_Send;
+	TdxBarLargeButton *MenuBtn_Download;
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall MenuBtn_ConnectClick(TObject *Sender);
 	void __fastcall MenuBtn_SendClick(TObject *Sender);

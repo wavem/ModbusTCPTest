@@ -105,12 +105,12 @@ void __fastcall CSocketThread::Execute() {
 			//memset(&recvData, 0, sizeof(recvData));
 			//memcpy(recvData.Data, recvBuff, RECV_BUF_SIZE);
 			//PostMessage(FormMain->Handle, MSG_SERVER_DATA, (unsigned int)&recvData, 0x10);
-            t_Str = L"Received";
-			SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&t_Str, 0x10);
+            t_Str = L"Received Packet";
+			//SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&t_Str, 0x10);
 		} else {
-			t_Str = L"Fail to Receive";
-			SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&t_Str, 0x10);
-			return;
+			//t_Str = L"Fail to Receive";
+			//SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&t_Str, 0x10);
+			//return;
 		}
 
 		// Just Wait Moment...
@@ -132,59 +132,71 @@ bool __fastcall CSocketThread::Receive() {
 	// Reset Buffer
 	memset(recvBuff, 0, sizeof(recvBuff));
 
-    BYTE t_Header[7] = {0, };
-    t_recvSize = recv(*m_sock, (char*)&t_Header, 7, 0);
-
+    // Get Header Info (Header 7 Byte)
+    t_recvSize = recv(*m_sock, (char*)&recvBuff, 7, 0);
     if(t_recvSize < 0) {
     	tempStr = L"Fail to Receive Packet";
         SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
     	return false;
     }
 
-
-
-    BYTE Des_ID = t_Header[0];
-    BYTE FCode = t_Header[1];
-    BYTE carID = t_Header[3];
-    unsigned short t_TotalCnt = 0;
-    memcpy(&t_TotalCnt, &t_Header[4], 2);
-    BYTE t_BodySize = t_Header[6];
-
-    //BYTE* t_BodyBuffer = new BYTE[t_BodySize];
-    memset(recvBuff, 0, sizeof(recvBuff));
-
-    t_recvSize = recv(*m_sock, (char*)&recvBuff, t_BodySize, 0);
-
-    if(t_recvSize < -1) {
-        tempStr = L"Fail to Receive Body Packet";
-        SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
-        return false;
-    }
-
-    unsigned short t_CRCValue = 0;
-    t_recvSize = recv(*m_sock, (char*)&t_CRCValue, 2, 0);
-    if(t_recvSize < -1) {
-    	tempStr = L"Fail to Receive CRC Value";
-        SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
-        return false;
-    }
-
-
-
-    SendMessage(FormMain->Handle, MSG_SERVER_DATA, (unsigned int)recvBuff, t_BodySize);
-
-
-
-
-	tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X ... (Total Size : %d)",
-    				t_Header[0], t_Header[1], t_Header[2], t_Header[3], t_Header[4], t_Header[5], t_Header[6], t_BodySize + 9);
+    // Print Header Info
+    tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X ... (Header Size : %d)",
+    				recvBuff[0], recvBuff[1], recvBuff[2], recvBuff[3], recvBuff[4], recvBuff[5], recvBuff[6], t_recvSize);
     SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x20);
 
-    //delete t_BodyBuffer;
+    // Save Header Info into temp buffer
+    BYTE t_FCode = recvBuff[1];
+    unsigned short t_TotalBlockCnt = 0;
+    memcpy(&t_TotalBlockCnt, &recvBuff[4], 2);
+    BYTE t_BodySize = recvBuff[6];
+
+    // ERROR CODE CHECK
+    if(t_FCode == 0x81) {
+    	tempStr = L"FCODE ERROR (0x81)";
+        //SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
+        //return false;
+    }
+
+    // Determine Data Type (FAULT / OPERATION / WATT / MILEAGE)
+    switch(t_FCode) {
+    	default:
+        	tempStr = L"FCODE ERROR OCCUR";
+        	SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
+            return false;
+            break;
+
+        case 0x65: // FAULT
+        	t_PacketSize = 7/*Header*/ + t_BodySize + 2;/*CRC*/
+        	break;
+
+        case 0x66: // OPERATION
+        	t_PacketSize = 7/*Header*/ + t_BodySize/*Block Count*/ * 180 + 2;/*CRC*/
+        	break;
+    }
+
+    // Receive Routine
+	t_CurrentSize = t_recvSize; // Must be '7'
+	while(t_CurrentSize != t_PacketSize) {
+		t_recvSize = recv(*m_sock, (char*)(recvBuff + t_CurrentSize), t_PacketSize - t_CurrentSize, 0);
+		// Check Connection
+		if(t_recvSize == 0 || t_recvSize == -1) {
+        	tempStr = L"Connection Failed";
+        	SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x10);
+        	return false;
+        }
+		t_CurrentSize += t_recvSize;
+	}
+
+    SendMessage(FormMain->Handle, MSG_SERVER_DATA, (unsigned int)recvBuff, t_PacketSize);
+
+	//tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X ... (Total Size : %d)",
+    //				t_Header[0], t_Header[1], t_Header[2], t_Header[3], t_Header[4], t_Header[5], t_Header[6], t_BodySize + 9);
+    //SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x20);
+
     return true;
 
 #if 0
-
 	// First Receive
 	t_recvSize = recv(*m_sock, (char*)&t_SecureCode, 1, 0);
 
@@ -223,9 +235,7 @@ bool __fastcall CSocketThread::Receive() {
 		if(t_recvSize == 0 || t_recvSize == -1) return false;
 		t_CurrentSize += t_recvSize;
 	}
-
 #endif
-	// return true;
 }
 //---------------------------------------------------------------------------
 
