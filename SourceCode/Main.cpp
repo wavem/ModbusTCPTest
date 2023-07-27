@@ -234,25 +234,20 @@ void __fastcall TFormMain::PrintThreadLogMessage(TMessage &_msg) {
 
 void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
 
-	//PrintMsg(L"RECVDATA!!!");
-
 	// Common
 	UnicodeString tempStr = L"";
     UnicodeString t_OutputStr = L"";
 	unsigned int t_wParam = _msg.WParam;
-	int t_lParam = _msg.LParam;
-	//SERVERDATA* p_serverData = NULL;
-	//SERVERDATA t_serverData;
-	//memset(&t_serverData, 0, sizeof(t_serverData));
+	int t_lParam = _msg.LParam; // LParam is Body Size
 	unsigned short t_RecvSize = 0;
-
-    int t_BodySize = t_lParam;
+    int t_BodySize = t_lParam; // Get Body Size
 
     // Copy Stream
     BYTE* p_Buffer = (BYTE*)t_wParam;
     memcpy(m_RecvBuf, p_Buffer, t_BodySize);
 
-    tempStr.sprintf(L"Packet Received (Size : %d)", t_lParam);
+    // Print Received Packet Size
+    tempStr.sprintf(L"Packet Received (Size : %d)", t_BodySize);
     PrintMsg(tempStr);
 
     // Print Header
@@ -269,17 +264,6 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     	t_OutputStr += tempStr;
     }
     PrintRecv(t_OutputStr);
-
-
-	// Receive Server Data
-//	p_serverData = (SERVERDATA*)t_wParam;
-//	t_serverData = *p_serverData;
-
-	// Logging Received Information
-//	memcpy(&t_RecvSize, &t_serverData.Data[1], 2);
-//	tempStr.sprintf(L"Received %04d byte from Server", t_RecvSize);
-//	PrintLog(tempStr);
-
 }
 //---------------------------------------------------------------------------
 
