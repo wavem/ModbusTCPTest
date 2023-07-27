@@ -94,6 +94,7 @@ void __fastcall TFormMain::InitProgram() {
     m_bIsNowDownloading = false;
     m_TotalDataBlockCount = 0;
     m_CurrentSaveIndex = 0;
+    memset(m_FileBuf, 0, sizeof(m_FileBuf));
 
 	// Init Socket
     if(InitSocket()) {
@@ -287,15 +288,17 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     // Get Current Data Size
     unsigned short t_CurrentSize = m_RecvBuf[6];
 
-    //m_CurrentRequestSize
-
     // Save to File Buffer
-    //m_FileBuf
     if(t_FCode == 0x65) {
     	memcpy(m_FileBuf + m_CurrentSaveIndex, m_RecvBuf + 7, t_CurrentSize);
         m_CurrentSaveIndex += t_CurrentSize;
     } else if(t_FCode == 0x66) {
-
+    	memcpy(m_FileBuf + m_CurrentSaveIndex, m_RecvBuf + 7, t_CurrentSize * 180);
+        m_CurrentSaveIndex += t_CurrentSize * 180;
+    } else {
+        tempStr.sprintf(L"Download Failed (FCODE ERROR)");
+        PrintMsg(tempStr);
+        return;
     }
 
 
@@ -310,25 +313,55 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
             	m_StartIdx += m_TotalDataBlockCount - m_StartIdx;
             } else {
                 PrintMsg(L"Fault Download Complete");
-                SaveFile();
+                SaveFile(0x65);
                 m_bIsNowDownloading = false;
                 m_StartIdx = 0;
                 m_CurrentSaveIndex = 0;
             }
         }
     } else if(t_FCode == 0x66) {
+    	if(m_StartIdx + 10 <= m_TotalDataBlockCount) {
+        	SendRequestPacket(0x66, m_StartIdx, 10);
+            m_StartIdx += 10;
+        } else {
+        	if(m_TotalDataBlockCount - m_StartIdx > 0) {
+            	SendRequestPacket(0x66, m_StartIdx, m_TotalDataBlockCount - m_StartIdx);
+            	m_StartIdx += m_TotalDataBlockCount - m_StartIdx;
+            } else {
+                PrintMsg(L"Opdata Download Complete");
+                SaveFile(0x66);
+                m_bIsNowDownloading = false;
+                m_StartIdx = 0;
+                m_CurrentSaveIndex = 0;
+            }
+        }
 
     }
 }
 //---------------------------------------------------------------------------
 
-bool __fastcall TFormMain::SaveFile() {
+bool __fastcall TFormMain::SaveFile(int _Type) {
 
 	// Common
     UnicodeString tempStr = L"FaultData.bin";
     UnicodeString t_RootPath = ExtractFilePath(ParamStr(0));
     AnsiString t_dstPath = "";
     FILE* t_Wfp = NULL;
+    TDateTime t_DateTime;
+
+    // Determine File Name Routine Here
+    t_DateTime = Now();
+    if(_Type == 0x65) {
+    	tempStr = L"FaultData_";
+        tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
+        tempStr += L".bin";
+    } else if(_Type == 0x66) {
+    	tempStr = L"Opdata_";
+        tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
+        tempStr += L".bin";
+    } else {
+        tempStr = L"unknown_File.bin";
+    }
 
     // Write File Routine
     //t_dstPath = t_RootPath + L"Data\\" + tempStr;
@@ -344,7 +377,11 @@ bool __fastcall TFormMain::SaveFile() {
     fseek(t_Wfp, 0, SEEK_SET);
 
     // File Write Routine
-    fwrite(m_FileBuf, 1, m_TotalDataBlockCount * 28, t_Wfp);
+    if(_Type == 0x65) {
+    	fwrite(m_FileBuf, 1, m_TotalDataBlockCount * 28, t_Wfp);
+    } else if(_Type == 0x66) {
+    	fwrite(m_FileBuf, 1, m_TotalDataBlockCount * 180, t_Wfp);
+    }
 
     fclose(t_Wfp);
     return true;
@@ -438,6 +475,8 @@ bool __fastcall TFormMain::SendTestPacket() {
 
 void __fastcall TFormMain::MenuBtn_FaultDownloadClick(TObject *Sender)
 {
+	memset(m_FileBuf, 0, sizeof(m_FileBuf));
+    m_CurrentSaveIndex = 0;
     if(SendRequestPacket(0x65, 0, 1)) {
     	m_bIsNowDownloading = true;
         m_StartIdx = 1;
@@ -448,6 +487,8 @@ void __fastcall TFormMain::MenuBtn_FaultDownloadClick(TObject *Sender)
 
 void __fastcall TFormMain::MenuBtn_OpdataDownloadClick(TObject *Sender)
 {
+	memset(m_FileBuf, 0, sizeof(m_FileBuf));
+    m_CurrentSaveIndex = 0;
     if(SendRequestPacket(0x66, 0, 1)) {
     	m_bIsNowDownloading = true;
         m_StartIdx = 1;
