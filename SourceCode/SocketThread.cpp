@@ -114,7 +114,7 @@ void __fastcall CSocketThread::Execute() {
 		}
 
 		// Just Wait Moment...
-		WaitForSingleObject((void*)this->Handle, 50);
+		//WaitForSingleObject((void*)this->Handle, 50);
 	}
 	m_eThreadWork = THREAD_TERMINATED;
 	return;
@@ -141,9 +141,9 @@ bool __fastcall CSocketThread::Receive() {
     }
 
     // Print Header Info
-    tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X ... (Header Size : %d)",
-    				recvBuff[0], recvBuff[1], recvBuff[2], recvBuff[3], recvBuff[4], recvBuff[5], recvBuff[6], t_recvSize);
-    SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x20);
+    //tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X ... (Header Size : %d)",
+    //				recvBuff[0], recvBuff[1], recvBuff[2], recvBuff[3], recvBuff[4], recvBuff[5], recvBuff[6], t_recvSize);
+    //SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&tempStr, 0x20);
 
     // Save Header Info into temp buffer
     BYTE t_FCode = recvBuff[1];

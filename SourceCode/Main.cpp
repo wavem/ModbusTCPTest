@@ -252,23 +252,32 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     memcpy(m_RecvBuf, p_Buffer, t_BodySize);
 
     // Print Received Packet Size
-    tempStr.sprintf(L"Packet Received (Size : %d)", t_BodySize);
-    PrintMsg(tempStr);
+    //tempStr.sprintf(L"Packet Received (Size : %d)", t_BodySize);
+    //PrintMsg(tempStr);
+
+
+    // Packet Count Test Temp Code
+    static int t_PacketCount = 0;
+    tempStr.sprintf(L"Count : %d", t_PacketCount++);
+    if(t_PacketCount % 100 == 0) {
+    	PrintMsg(tempStr);
+    }
+
 
     // Print Header
-    for(int i = 0 ; i < 7 ; i++) {
-    	tempStr.sprintf(L"%02X ", m_RecvBuf[i]);
-    	t_OutputStr += tempStr;
-    }
-    PrintRecv(t_OutputStr);
+    //for(int i = 0 ; i < 7 ; i++) {
+    //	tempStr.sprintf(L"%02X ", m_RecvBuf[i]);
+    //	t_OutputStr += tempStr;
+    //}
+    //PrintRecv(t_OutputStr);
 
     // Print Body
-    t_OutputStr = L"";
-    for(int i = 7 ; i < t_BodySize - 7; i++) {
-    	tempStr.sprintf(L"%02X ", m_RecvBuf[i]);
-    	t_OutputStr += tempStr;
-    }
-    PrintRecv(t_OutputStr);
+    //t_OutputStr = L"";
+    //for(int i = 7 ; i < t_BodySize - 7; i++) {
+    //	tempStr.sprintf(L"%02X ", m_RecvBuf[i]);
+    //	t_OutputStr += tempStr;
+    //}
+    //PrintRecv(t_OutputStr);
 
 
     // Download Routine
@@ -282,8 +291,8 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     memcpy(&m_TotalDataBlockCount, &m_RecvBuf[4], 2);
     m_TotalDataBlockCount = ntohs(m_TotalDataBlockCount);
 
-    tempStr.sprintf(L"Total Block Size : %d", m_TotalDataBlockCount);
-    PrintMsg(tempStr);
+    //tempStr.sprintf(L"Total Block Size : %d", m_TotalDataBlockCount);
+    //PrintMsg(tempStr);
 
     // Get Current Data Size
     unsigned short t_CurrentSize = m_RecvBuf[6];
@@ -294,7 +303,7 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
         m_CurrentSaveIndex += t_CurrentSize;
     } else if(t_FCode == 0x66) {
     	memcpy(m_FileBuf + m_CurrentSaveIndex, m_RecvBuf + 7, t_CurrentSize * 180);
-        m_CurrentSaveIndex += t_CurrentSize * 180;
+        m_CurrentSaveIndex += (t_CurrentSize * 180);
     } else {
         tempStr.sprintf(L"Download Failed (FCODE ERROR)");
         PrintMsg(tempStr);
@@ -541,17 +550,17 @@ bool __fastcall TFormMain::SendRequestPacket(unsigned char _FCode, unsigned shor
 	t_sendrst = send(m_TCPSocket, (char*)m_SendBuf, 8, 0);
 
 	// Function End Routine
-	tempStr.sprintf(L"Send Byte : %d", t_sendrst);
-	PrintMsg(tempStr);
+	//tempStr.sprintf(L"Send Byte : %d", t_sendrst);
+	//PrintMsg(tempStr);
 
     if(t_sendrst < 0) {
     	PrintMsg(L"Fail to Send...");
         return false;
     }
 
-	tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X %02X",
-    	m_SendBuf[0], m_SendBuf[1], m_SendBuf[2], m_SendBuf[3], m_SendBuf[4], m_SendBuf[5], m_SendBuf[6], m_SendBuf[7]);
-    PrintSend(tempStr);
+	//tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X %02X",
+    //	m_SendBuf[0], m_SendBuf[1], m_SendBuf[2], m_SendBuf[3], m_SendBuf[4], m_SendBuf[5], m_SendBuf[6], m_SendBuf[7]);
+    //PrintSend(tempStr);
 	return true;
 }
 //---------------------------------------------------------------------------
