@@ -4,6 +4,7 @@
 #pragma hdrstop
 
 #include "Main.h"
+#include <stdio.h>
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma link "cxClasses"
@@ -92,7 +93,7 @@ void __fastcall TFormMain::InitProgram() {
     m_TCPSocket = INVALID_SOCKET;
     m_bIsNowDownloading = false;
     m_TotalDataBlockCount = 0;
-    m_CurrentRequestIndex = 0;
+    m_CurrentSaveIndex = 0;
 
 	// Init Socket
     if(InitSocket()) {
@@ -287,6 +288,18 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     unsigned short t_CurrentSize = m_RecvBuf[6];
 
     //m_CurrentRequestSize
+
+    // Save to File Buffer
+    //m_FileBuf
+    if(t_FCode == 0x65) {
+    	memcpy(m_FileBuf + m_CurrentSaveIndex, m_RecvBuf + 7, t_CurrentSize);
+        m_CurrentSaveIndex += t_CurrentSize;
+    } else if(t_FCode == 0x66) {
+
+    }
+
+
+    // Request Routine
     if(t_FCode == 0x65) {
     	if(m_StartIdx + 8 <= m_TotalDataBlockCount) {
         	SendRequestPacket(0x65, m_StartIdx, 8);
@@ -297,15 +310,44 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
             	m_StartIdx += m_TotalDataBlockCount - m_StartIdx;
             } else {
                 PrintMsg(L"Fault Download Complete");
+                SaveFile();
                 m_bIsNowDownloading = false;
                 m_StartIdx = 0;
+                m_CurrentSaveIndex = 0;
             }
         }
     } else if(t_FCode == 0x66) {
 
     }
+}
+//---------------------------------------------------------------------------
 
+bool __fastcall TFormMain::SaveFile() {
 
+	// Common
+    UnicodeString tempStr = L"FaultData.bin";
+    UnicodeString t_RootPath = ExtractFilePath(ParamStr(0));
+    AnsiString t_dstPath = "";
+    FILE* t_Wfp = NULL;
+
+    // Write File Routine
+    //t_dstPath = t_RootPath + L"Data\\" + tempStr;
+    t_dstPath = t_RootPath + L"Data\\" + tempStr;
+    PrintMsg(t_dstPath);
+    t_Wfp = fopen(t_dstPath.c_str(), "wb");
+    if(!t_Wfp) {
+    	PrintMsg(L"Fail to Create Data File");
+        return false;
+    }
+
+    // Init File Pointer Index
+    fseek(t_Wfp, 0, SEEK_SET);
+
+    // File Write Routine
+    fwrite(m_FileBuf, 1, m_TotalDataBlockCount * 28, t_Wfp);
+
+    fclose(t_Wfp);
+    return true;
 }
 //---------------------------------------------------------------------------
 

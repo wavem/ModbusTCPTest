@@ -134,8 +134,11 @@ public: // Download Functions
 	bool __fastcall SendRequestPacket(unsigned char _FCode, unsigned short _StartIdx, unsigned short _Size);
     unsigned short m_StartIdx;
     unsigned short m_TotalDataBlockCount;
-    unsigned short m_CurrentRequestIndex;
+    unsigned short m_CurrentSaveIndex;
     unsigned short __fastcall GetCRCValue(BYTE* _pData, int _DataSize);
+	BYTE m_FileBuf[FILE_SAVE_BUF_SIZE];
+    bool __fastcall SaveFile();
+
 
 public: // SOCKET
 	CSocketThread *m_pSocketThread;
