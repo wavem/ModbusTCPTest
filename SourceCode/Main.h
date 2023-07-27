@@ -109,10 +109,13 @@ __published:	// IDE-managed Components
 	TLabel *Label10;
 	TdxBar *BarMgrBar2;
 	TdxBarLargeButton *MenuBtn_Send;
-	TdxBarLargeButton *MenuBtn_Download;
+	TdxBarLargeButton *MenuBtn_FaultDownload;
+	TdxBarLargeButton *MenuBtn_OpdataDownload;
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall MenuBtn_ConnectClick(TObject *Sender);
 	void __fastcall MenuBtn_SendClick(TObject *Sender);
+	void __fastcall MenuBtn_FaultDownloadClick(TObject *Sender);
+	void __fastcall MenuBtn_OpdataDownloadClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TFormMain(TComponent* Owner);
@@ -124,6 +127,16 @@ public: // DEFAULT FUNCTIONS
     void __fastcall PrintSend(UnicodeString _str);
     void __fastcall PrintRecv(UnicodeString _str);
 
+public: // DEFAULT MEMBER VARIABLES
+	bool m_bIsNowDownloading;
+
+public: // Download Functions
+	bool __fastcall SendRequestPacket(unsigned char _FCode, unsigned short _StartIdx, unsigned short _Size);
+    unsigned short m_StartIdx;
+    unsigned short m_TotalDataBlockCount;
+    unsigned short m_CurrentRequestIndex;
+    unsigned short __fastcall GetCRCValue(BYTE* _pData, int _DataSize);
+
 public: // SOCKET
 	CSocketThread *m_pSocketThread;
 	SOCKET m_TCPSocket;
@@ -132,9 +145,8 @@ public: // SOCKET
 	bool __fastcall InitSocket();
     BYTE m_SendBuf[SEND_BUF_SIZE];
     BYTE m_RecvBuf[RECV_BUF_SIZE];
-    bool __fastcall SendPacket();
+    bool __fastcall SendTestPacket();
     void __fastcall ExtractSendData();
-    bool __fastcall MakingCRC();
 
 
 

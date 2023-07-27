@@ -90,6 +90,9 @@ void __fastcall TFormMain::InitProgram() {
 	// Init Member Variables
     m_pSocketThread = NULL;
     m_TCPSocket = INVALID_SOCKET;
+    m_bIsNowDownloading = false;
+    m_TotalDataBlockCount = 0;
+    m_CurrentRequestIndex = 0;
 
 	// Init Socket
     if(InitSocket()) {
@@ -264,88 +267,77 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     	t_OutputStr += tempStr;
     }
     PrintRecv(t_OutputStr);
+
+
+    // Download Routine
+    // Pre Return
+    if(m_bIsNowDownloading == false) return;
+
+    // Get FCode
+    BYTE t_FCode = m_RecvBuf[1];
+
+    // Get Total Data Block Count
+    memcpy(&m_TotalDataBlockCount, &m_RecvBuf[4], 2);
+    m_TotalDataBlockCount = ntohs(m_TotalDataBlockCount);
+
+    tempStr.sprintf(L"Total Block Size : %d", m_TotalDataBlockCount);
+    PrintMsg(tempStr);
+
+    // Get Current Data Size
+    unsigned short t_CurrentSize = m_RecvBuf[6];
+
+    //m_CurrentRequestSize
+    if(t_FCode == 0x65) {
+    	if(m_StartIdx + 8 <= m_TotalDataBlockCount) {
+        	SendRequestPacket(0x65, m_StartIdx, 8);
+            m_StartIdx += 8;
+        } else {
+        	if(m_TotalDataBlockCount - m_StartIdx > 0) {
+            	SendRequestPacket(0x65, m_StartIdx, m_TotalDataBlockCount - m_StartIdx);
+            	m_StartIdx += m_TotalDataBlockCount - m_StartIdx;
+            } else {
+                PrintMsg(L"Fault Download Complete");
+                m_bIsNowDownloading = false;
+                m_StartIdx = 0;
+            }
+        }
+    } else if(t_FCode == 0x66) {
+
+    }
+
+
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::MenuBtn_SendClick(TObject *Sender)
 {
-	if(MakingCRC() == false) {
-    	PrintMsg(L"CRC Failed...");
-        return;
-    }
-
     ExtractSendData();
-    SendPacket();
-}
-//---------------------------------------------------------------------------
-
-bool __fastcall TFormMain::MakingCRC() {
-
-	// GET 0~5 BYTE OFFSET DATA
-    BYTE t_Buff[8] = {0, };
-
-    t_Buff[0] = ed_SendBuf_0->IntValue;
-    t_Buff[1] = ed_SendBuf_1->IntValue;
-    t_Buff[2] = ed_SendBuf_2->IntValue;
-    t_Buff[3] = ed_SendBuf_3->IntValue;
-    t_Buff[4] = ed_SendBuf_4->IntValue;
-    t_Buff[5] = ed_SendBuf_5->IntValue;
-
-    // Test Code
-    UnicodeString tempStr = L"";
-    tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X", t_Buff[0], t_Buff[1], t_Buff[2], t_Buff[3], t_Buff[4], t_Buff[5]);
-    //PrintMsg(tempStr);
-
-
-    // CRC ROUTINE
-    unsigned short crc = 0xFFFF;
-    unsigned short flag = 0;
-
-    for(int idx = 0 ; idx < 6 ; idx++) {
-    	crc ^= t_Buff[idx];
-
-		for (int i = 0 ; i < 8 ; i++) {
-			flag = crc & 0x0001;
-			crc >>= 1;
-			if(flag) crc ^= POLYNORMIAL;
-		}
-    }
-
-	BYTE* t_pByte = (BYTE *)&crc;
-	t_Buff[6] = t_pByte[0];
-	t_Buff[7] = t_pByte[1];
-
-    tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X %02X",
-    				t_Buff[0], t_Buff[1], t_Buff[2], t_Buff[3], t_Buff[4], t_Buff[5], t_Buff[6], t_Buff[7]);
-    //PrintMsg(tempStr);
-
-    // Set Calculated CRC Value into Edit Control
-    ed_SendBuf_6->IntValue = t_Buff[6];
-    ed_SendBuf_7->IntValue = t_Buff[7];
-
-	return true;
+    SendTestPacket();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::ExtractSendData() {
-
 	m_SendBuf[0] = ed_SendBuf_0->IntValue; // Des ID
     m_SendBuf[1] = ed_SendBuf_1->IntValue; // F-Code
     m_SendBuf[2] = ed_SendBuf_2->IntValue; // Start Add
     m_SendBuf[3] = ed_SendBuf_3->IntValue;
     m_SendBuf[4] = ed_SendBuf_4->IntValue; // Num of Pos
     m_SendBuf[5] = ed_SendBuf_5->IntValue;
-    m_SendBuf[6] = ed_SendBuf_6->IntValue; // CRC
-    m_SendBuf[7] = ed_SendBuf_7->IntValue; // CRC
+
+    unsigned short t_CRCValue = GetCRCValue(m_SendBuf, 6);
+    memcpy(&m_SendBuf[6], &t_CRCValue, 2);
+
+    // Print to Edit Control
+    //ed_SendBuf_6->IntValue = m_SendBuf[6];
+    //ed_SendBuf_7->IntValue = m_SendBuf[7];
 }
 //---------------------------------------------------------------------------
 
-bool __fastcall TFormMain::SendPacket() {
+bool __fastcall TFormMain::SendTestPacket() {
 
 	// Common
 	UnicodeString tempStr = L"";
 	int t_sendrst = 0;
-	UnicodeString t_RoomTitle = L"";
 	unsigned short t_PacketLen = 8;
 
 	// Check Client Socket
@@ -402,4 +394,100 @@ bool __fastcall TFormMain::SendPacket() {
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TFormMain::MenuBtn_FaultDownloadClick(TObject *Sender)
+{
+    if(SendRequestPacket(0x65, 0, 1)) {
+    	m_bIsNowDownloading = true;
+        m_StartIdx = 1;
+    	PrintMsg(L"Fault Download Start");
+    }
+}
+//---------------------------------------------------------------------------
 
+void __fastcall TFormMain::MenuBtn_OpdataDownloadClick(TObject *Sender)
+{
+    if(SendRequestPacket(0x66, 0, 1)) {
+    	m_bIsNowDownloading = true;
+        m_StartIdx = 1;
+    	PrintMsg(L"Opdata Download Start");
+    }
+}
+//---------------------------------------------------------------------------
+
+bool __fastcall TFormMain::SendRequestPacket(unsigned char _FCode, unsigned short _StartIdx, unsigned short _Size) {
+
+	// Common
+	UnicodeString tempStr = L"";
+	int t_sendrst = 0;
+	unsigned short t_PacketLen = 8;
+    unsigned short t_CRCValue = 0;
+    unsigned short t_usValue = 0;
+
+	// Check Client Socket
+	if(m_TCPSocket == INVALID_SOCKET) {
+		tempStr.sprintf(L"Client socket is invalid");
+		PrintMsg(tempStr);
+		return false;
+	}
+
+	// Check Client Thread
+	if(m_pSocketThread == NULL) {
+		tempStr.sprintf(L"Client Thread is invalid");
+		PrintMsg(tempStr);
+		return false;
+	}
+
+	// Check Connection
+	if(m_pSocketThread->isConnected == false) {
+		tempStr.sprintf(L"Client is not connected");
+		PrintMsg(tempStr);
+		return false;
+	}
+
+    // Making Send Data
+    m_SendBuf[0] = 0x01; // Des ID
+    m_SendBuf[1] = _FCode; // F-Code
+    t_usValue = htons(_StartIdx);
+    memcpy(&m_SendBuf[2], &t_usValue, 2); // Start Add
+	t_usValue = htons(_Size);
+    memcpy(&m_SendBuf[4], &t_usValue, 2); // Num of Pos
+    t_CRCValue = GetCRCValue(m_SendBuf, 6); // Making CRC Value
+    memcpy(&m_SendBuf[6], &t_CRCValue, 2); // CRC Value Setting
+
+	// Send to Server
+	t_sendrst = send(m_TCPSocket, (char*)m_SendBuf, 8, 0);
+
+	// Function End Routine
+	tempStr.sprintf(L"Send Byte : %d", t_sendrst);
+	PrintMsg(tempStr);
+
+    if(t_sendrst < 0) {
+    	PrintMsg(L"Fail to Send...");
+        return false;
+    }
+
+	tempStr.sprintf(L"%02X %02X %02X %02X %02X %02X %02X %02X",
+    	m_SendBuf[0], m_SendBuf[1], m_SendBuf[2], m_SendBuf[3], m_SendBuf[4], m_SendBuf[5], m_SendBuf[6], m_SendBuf[7]);
+    PrintSend(tempStr);
+	return true;
+}
+//---------------------------------------------------------------------------
+
+unsigned short __fastcall TFormMain::GetCRCValue(BYTE* _pData, int _DataSize) {
+	int i;
+	unsigned short crc, flag;
+	crc = 0xFFFF;
+	while(_DataSize--)
+	{
+		crc ^= *_pData++;
+
+		for (i=0; i<8; i++)
+		{
+			flag = crc & 0x0001;
+			crc >>= 1;
+			if(flag) crc ^= POLYNORMIAL;
+		}
+	}
+	return crc;
+}
+//---------------------------------------------------------------------------
