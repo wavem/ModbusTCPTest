@@ -287,6 +287,9 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     // Get FCode
     BYTE t_FCode = m_RecvBuf[1];
 
+    // Get Car ID
+    BYTE t_CarID = m_RecvBuf[3];
+
     // Get Total Data Block Count
     memcpy(&m_TotalDataBlockCount, &m_RecvBuf[4], 2);
     m_TotalDataBlockCount = ntohs(m_TotalDataBlockCount);
@@ -322,7 +325,7 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
             	m_StartIdx += m_TotalDataBlockCount - m_StartIdx;
             } else {
                 PrintMsg(L"Fault Download Complete");
-                SaveFile(0x65);
+                SaveFile(0x65, t_CarID);
                 m_bIsNowDownloading = false;
                 m_StartIdx = 0;
                 m_CurrentSaveIndex = 0;
@@ -338,7 +341,7 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
             	m_StartIdx += m_TotalDataBlockCount - m_StartIdx;
             } else {
                 PrintMsg(L"Opdata Download Complete");
-                SaveFile(0x66);
+                SaveFile(0x66, t_CarID);
                 m_bIsNowDownloading = false;
                 m_StartIdx = 0;
                 m_CurrentSaveIndex = 0;
@@ -349,10 +352,10 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
 }
 //---------------------------------------------------------------------------
 
-bool __fastcall TFormMain::SaveFile(int _Type) {
+bool __fastcall TFormMain::SaveFile(int _Type, BYTE _CarID) {
 
 	// Common
-    UnicodeString tempStr = L"FaultData.bin";
+    UnicodeString tempStr = L"";
     UnicodeString t_RootPath = ExtractFilePath(ParamStr(0));
     AnsiString t_dstPath = "";
     FILE* t_Wfp = NULL;
@@ -361,11 +364,11 @@ bool __fastcall TFormMain::SaveFile(int _Type) {
     // Determine File Name Routine Here
     t_DateTime = Now();
     if(_Type == 0x65) {
-    	tempStr = L"FaultData_";
+    	tempStr.sprintf(L"FaultData_CAR%03d_", _CarID);
         tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
         tempStr += L".bin";
     } else if(_Type == 0x66) {
-    	tempStr = L"Opdata_";
+        tempStr.sprintf(L"OpData_CAR%03d_", _CarID);
         tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
         tempStr += L".bin";
     } else {

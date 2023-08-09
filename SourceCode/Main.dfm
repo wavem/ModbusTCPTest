@@ -2,9 +2,9 @@ object FormMain: TFormMain
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  Caption = 'Modbus TCP Test'
-  ClientHeight = 836
-  ClientWidth = 1083
+  Caption = 'Modbus TCP Download (ver 0.0.1)'
+  ClientHeight = 480
+  ClientWidth = 596
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -20,13 +20,15 @@ object FormMain: TFormMain
   object ___pnBase: TPanel
     Left = 0
     Top = 124
-    Width = 1083
-    Height = 712
+    Width = 596
+    Height = 356
     Align = alClient
     BevelOuter = bvNone
     Color = 5000268
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 1083
+    ExplicitHeight = 712
     object Label1: TLabel
       Left = 8
       Top = 445
@@ -58,8 +60,8 @@ object FormMain: TFormMain
       ParentFont = False
     end
     object Label3: TLabel
-      Left = 656
-      Top = 13
+      Left = 24
+      Top = 6
       Width = 20
       Height = 13
       Caption = 'LOG'
@@ -73,8 +75,8 @@ object FormMain: TFormMain
       ParentFont = False
     end
     object Label4: TLabel
-      Left = 27
-      Top = 29
+      Left = 47
+      Top = 381
       Width = 35
       Height = 13
       Caption = 'Des_ID'
@@ -86,10 +88,11 @@ object FormMain: TFormMain
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      Visible = False
     end
     object Label5: TLabel
-      Left = 74
-      Top = 29
+      Left = 94
+      Top = 381
       Width = 35
       Height = 13
       Caption = 'F-Code'
@@ -101,10 +104,11 @@ object FormMain: TFormMain
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      Visible = False
     end
     object Label6: TLabel
-      Left = 142
-      Top = 29
+      Left = 162
+      Top = 381
       Width = 43
       Height = 13
       Caption = 'StartAdd'
@@ -116,10 +120,11 @@ object FormMain: TFormMain
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      Visible = False
     end
     object Label7: TLabel
-      Left = 217
-      Top = 29
+      Left = 237
+      Top = 381
       Width = 74
       Height = 13
       Caption = 'Num of Position'
@@ -131,10 +136,11 @@ object FormMain: TFormMain
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      Visible = False
     end
     object Label8: TLabel
-      Left = 312
-      Top = 29
+      Left = 332
+      Top = 381
       Width = 21
       Height = 13
       Caption = 'High'
@@ -146,10 +152,11 @@ object FormMain: TFormMain
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      Visible = False
     end
     object Label9: TLabel
-      Left = 360
-      Top = 29
+      Left = 380
+      Top = 381
       Width = 19
       Height = 13
       Caption = 'Low'
@@ -161,10 +168,11 @@ object FormMain: TFormMain
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      Visible = False
     end
     object Label10: TLabel
-      Left = 334
-      Top = 10
+      Left = 354
+      Top = 362
       Width = 21
       Height = 13
       Caption = 'CRC'
@@ -176,12 +184,13 @@ object FormMain: TFormMain
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      Visible = False
     end
     object memo: TAdvMemo
-      Left = 648
+      Left = 8
       Top = 32
-      Width = 435
-      Height = 426
+      Width = 577
+      Height = 313
       Cursor = crIBeam
       ActiveLineSettings.ShowActiveLine = False
       ActiveLineSettings.ShowActiveLineIndicator = False
@@ -300,7 +309,7 @@ object FormMain: TFormMain
     object memo_Send: TAdvMemo
       Left = 0
       Top = 464
-      Width = 435
+      Width = 329
       Height = 249
       Cursor = crIBeam
       ActiveLineSettings.ShowActiveLine = False
@@ -418,9 +427,9 @@ object FormMain: TFormMain
       WordWrap = wwNone
     end
     object memo_Recv: TAdvMemo
-      Left = 433
+      Left = 335
       Top = 464
-      Width = 650
+      Width = 432
       Height = 249
       Cursor = crIBeam
       ActiveLineSettings.ShowActiveLine = False
@@ -538,8 +547,8 @@ object FormMain: TFormMain
       WordWrap = wwNone
     end
     object ed_SendBuf_0: TAdvEdit
-      Left = 24
-      Top = 48
+      Left = 44
+      Top = 400
       Width = 41
       Height = 26
       EditAlign = eaCenter
@@ -568,12 +577,12 @@ object FormMain: TFormMain
       ParentFont = False
       TabOrder = 0
       Text = '01'
-      Visible = True
+      Visible = False
       Version = '3.3.5.3'
     end
     object ed_SendBuf_1: TAdvEdit
-      Left = 71
-      Top = 48
+      Left = 91
+      Top = 400
       Width = 41
       Height = 26
       EditAlign = eaCenter
@@ -602,12 +611,12 @@ object FormMain: TFormMain
       ParentFont = False
       TabOrder = 1
       Text = '0'
-      Visible = True
+      Visible = False
       Version = '3.3.5.3'
     end
     object ed_SendBuf_2: TAdvEdit
-      Left = 117
-      Top = 48
+      Left = 137
+      Top = 400
       Width = 41
       Height = 26
       EditAlign = eaCenter
@@ -636,12 +645,12 @@ object FormMain: TFormMain
       ParentFont = False
       TabOrder = 2
       Text = '0'
-      Visible = True
+      Visible = False
       Version = '3.3.5.3'
     end
     object ed_SendBuf_3: TAdvEdit
-      Left = 163
-      Top = 48
+      Left = 183
+      Top = 400
       Width = 41
       Height = 26
       EditAlign = eaCenter
@@ -670,12 +679,12 @@ object FormMain: TFormMain
       ParentFont = False
       TabOrder = 3
       Text = '0'
-      Visible = True
+      Visible = False
       Version = '3.3.5.3'
     end
     object ed_SendBuf_5: TAdvEdit
-      Left = 257
-      Top = 48
+      Left = 277
+      Top = 400
       Width = 41
       Height = 26
       EditAlign = eaCenter
@@ -704,12 +713,12 @@ object FormMain: TFormMain
       ParentFont = False
       TabOrder = 5
       Text = '0'
-      Visible = True
+      Visible = False
       Version = '3.3.5.3'
     end
     object ed_SendBuf_4: TAdvEdit
-      Left = 210
-      Top = 48
+      Left = 230
+      Top = 400
       Width = 41
       Height = 26
       EditAlign = eaCenter
@@ -738,12 +747,12 @@ object FormMain: TFormMain
       ParentFont = False
       TabOrder = 4
       Text = '0'
-      Visible = True
+      Visible = False
       Version = '3.3.5.3'
     end
     object ed_SendBuf_6: TAdvEdit
-      Left = 304
-      Top = 48
+      Left = 324
+      Top = 400
       Width = 41
       Height = 26
       EditAlign = eaCenter
@@ -772,12 +781,12 @@ object FormMain: TFormMain
       ParentFont = False
       TabOrder = 6
       Text = '0'
-      Visible = True
+      Visible = False
       Version = '3.3.5.3'
     end
     object ed_SendBuf_7: TAdvEdit
-      Left = 351
-      Top = 48
+      Left = 371
+      Top = 400
       Width = 41
       Height = 26
       EditAlign = eaCenter
@@ -806,20 +815,21 @@ object FormMain: TFormMain
       ParentFont = False
       TabOrder = 7
       Text = '0'
-      Visible = True
+      Visible = False
       Version = '3.3.5.3'
     end
   end
   object RibbonMenu: TdxRibbon
     Left = 0
     Top = 0
-    Width = 1083
+    Width = 596
     Height = 124
     BarManager = BarMgr
     ColorSchemeName = 'DevExpressDarkStyle'
     Contexts = <>
     TabOrder = 1
     TabStop = False
+    ExplicitWidth = 1083
     object RibbonMenuTab1: TdxRibbonTab
       Active = True
       Caption = 'Menu'
@@ -1048,7 +1058,7 @@ object FormMain: TFormMain
       Caption = 'Disconnect'
       Category = 0
       Hint = 'Disconnect'
-      Visible = ivAlways
+      Visible = ivNever
       HotGlyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
         2000000000000010000000000000000000000000000000000000000000000000
@@ -1186,7 +1196,7 @@ object FormMain: TFormMain
       Caption = 'Send'
       Category = 0
       Hint = 'Send'
-      Visible = ivAlways
+      Visible = ivNever
       OnClick = MenuBtn_SendClick
       HotGlyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
