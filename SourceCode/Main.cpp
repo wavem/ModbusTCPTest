@@ -4,6 +4,7 @@
 #pragma hdrstop
 
 #include "Main.h"
+#include "Dlg_Version.h"
 #include <stdio.h>
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -368,16 +369,19 @@ bool __fastcall TFormMain::SaveFile(int _Type, BYTE _CarID) {
         tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
         tempStr += L".bin";
     } else if(_Type == 0x66) {
-        tempStr.sprintf(L"OpData_CAR%03d_", _CarID);
-        tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
-        tempStr += L".bin";
+    	tempStr.sprintf(L"DN_");
+        tempStr += t_DateTime.FormatString(L"yymmdd-hhnnss");
+        tempStr += L"_NO1-CNCMC.trw";
+        //tempStr.sprintf(L"OpData_CAR%03d_", _CarID);
+        //tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
+        //tempStr += L".bin";
     } else {
         tempStr = L"unknown_File.bin";
     }
 
     // Write File Routine
     //t_dstPath = t_RootPath + L"Data\\" + tempStr;
-    t_dstPath = t_RootPath + L"Data\\" + tempStr;
+    t_dstPath = t_RootPath + L"DATA\\Operation\\" + tempStr;
     PrintMsg(t_dstPath);
     t_Wfp = fopen(t_dstPath.c_str(), "wb");
     if(!t_Wfp) {
@@ -586,3 +590,12 @@ unsigned short __fastcall TFormMain::GetCRCValue(BYTE* _pData, int _DataSize) {
 	return crc;
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TFormMain::MenuBtn_VersionClick(TObject *Sender)
+{
+	TFormVersion *p_dlg = new TFormVersion(NULL);
+    p_dlg->ShowModal();
+    delete p_dlg;
+}
+//---------------------------------------------------------------------------
+

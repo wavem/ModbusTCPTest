@@ -111,11 +111,14 @@ __published:	// IDE-managed Components
 	TdxBarLargeButton *MenuBtn_Send;
 	TdxBarLargeButton *MenuBtn_FaultDownload;
 	TdxBarLargeButton *MenuBtn_OpdataDownload;
+	TdxBar *BarMgrBar3;
+	TdxBarLargeButton *MenuBtn_Version;
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall MenuBtn_ConnectClick(TObject *Sender);
 	void __fastcall MenuBtn_SendClick(TObject *Sender);
 	void __fastcall MenuBtn_FaultDownloadClick(TObject *Sender);
 	void __fastcall MenuBtn_OpdataDownloadClick(TObject *Sender);
+	void __fastcall MenuBtn_VersionClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TFormMain(TComponent* Owner);
