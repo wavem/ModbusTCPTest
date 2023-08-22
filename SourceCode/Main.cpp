@@ -368,20 +368,22 @@ bool __fastcall TFormMain::SaveFile(int _Type, BYTE _CarID) {
     	tempStr.sprintf(L"FaultData_CAR%03d_", _CarID);
         tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
         tempStr += L".bin";
+        t_dstPath = t_RootPath + L"DATA\\Fault\\" + tempStr;
     } else if(_Type == 0x66) {
-    	tempStr.sprintf(L"DN_");
-        tempStr += t_DateTime.FormatString(L"yymmdd-hhnnss");
-        tempStr += L"_NO1-CNCMC.trw";
-        //tempStr.sprintf(L"OpData_CAR%03d_", _CarID);
-        //tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
-        //tempStr += L".bin";
+    	//tempStr.sprintf(L"DN_");                              // CPTM Ver
+        //tempStr += t_DateTime.FormatString(L"yymmdd-hhnnss"); // CPTM Ver
+        //tempStr += L"_NO1-CNCMC.trw"; 					    // CPTM Ver
+        tempStr.sprintf(L"OpData_CAR%03d_", _CarID);
+        tempStr += t_DateTime.FormatString(L"yyyymmdd_hhnnss");
+        tempStr += L".bin";
+        t_dstPath = t_RootPath + L"DATA\\Operation\\" + tempStr;
     } else {
         tempStr = L"unknown_File.bin";
     }
 
     // Write File Routine
     //t_dstPath = t_RootPath + L"Data\\" + tempStr;
-    t_dstPath = t_RootPath + L"DATA\\Operation\\" + tempStr;
+    //t_dstPath = t_RootPath + L"DATA\\Operation\\" + tempStr;
     PrintMsg(t_dstPath);
     t_Wfp = fopen(t_dstPath.c_str(), "wb");
     if(!t_Wfp) {

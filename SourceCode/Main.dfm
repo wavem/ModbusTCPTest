@@ -27,8 +27,6 @@ object FormMain: TFormMain
     Color = 5000268
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 1083
-    ExplicitHeight = 712
     object Label1: TLabel
       Left = 8
       Top = 445
@@ -829,7 +827,6 @@ object FormMain: TFormMain
     Contexts = <>
     TabOrder = 1
     TabStop = False
-    ExplicitWidth = 1083
     object RibbonMenuTab1: TdxRibbonTab
       Active = True
       Caption = 'Menu'
@@ -885,7 +882,7 @@ object FormMain: TFormMain
           ItemName = 'MenuBtn_Disconnect'
         end>
       OneOnRow = False
-      Row = 1
+      Row = 0
       UseOwnFont = False
       Visible = True
       WholeRow = False
@@ -913,7 +910,7 @@ object FormMain: TFormMain
           ItemName = 'MenuBtn_OpdataDownload'
         end>
       OneOnRow = False
-      Row = 1
+      Row = 0
       UseOwnFont = False
       Visible = True
       WholeRow = False
@@ -932,7 +929,7 @@ object FormMain: TFormMain
           Visible = True
           ItemName = 'MenuBtn_Version'
         end>
-      OneOnRow = True
+      OneOnRow = False
       Row = 0
       UseOwnFont = False
       Visible = True
