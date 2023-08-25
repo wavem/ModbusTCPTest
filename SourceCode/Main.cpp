@@ -382,7 +382,7 @@ bool __fastcall TFormMain::SaveFile(int _Type, BYTE _CarID) {
     }
 
     // Write File Routine
-    //t_dstPath = t_RootPath + L"Data\\" + tempStr;
+    //t_dstPath = t_RootPath + L"Data\\" + tempStr; // CPTM Ver
     //t_dstPath = t_RootPath + L"DATA\\Operation\\" + tempStr;
     PrintMsg(t_dstPath);
     t_Wfp = fopen(t_dstPath.c_str(), "wb");
