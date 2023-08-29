@@ -254,18 +254,9 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     BYTE* p_Buffer = (BYTE*)t_wParam;
     memcpy(m_RecvBuf, p_Buffer, t_BodySize);
 
-
-    //m_bIsFirstPacket
-
-
-
     // Print Received Packet Size
     //tempStr.sprintf(L"Packet Received (Size : %d)", t_BodySize);
     //PrintMsg(tempStr);
-
-
-
-
 
     // Print Header
     //for(int i = 0 ; i < 7 ; i++) {
@@ -282,10 +273,9 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     //}
     //PrintRecv(t_OutputStr);
 
-
     // Download Routine
     // Pre Return
-    if(m_bIsNowDownloading == false) return;
+    if(m_bIsNowDownloading == false) return; // Because Test Packet Sending (Just one packet)
 
     // Get FCode
     BYTE t_FCode = m_RecvBuf[1];
@@ -301,7 +291,6 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     m_TotalDataBlockCount = ntohs(m_TotalDataBlockCount);
 
     // Print Download Block Count
-    //tempStr.sprintf(L"Download Count : %d0", m_DownloadBlockCount++);
     m_DownloadBlockCount++;
     if(m_DownloadBlockCount % 100 == 0) {
     	tempStr.sprintf(L"Download %d/%d", m_DownloadBlockCount * 10, m_TotalDataBlockCount);
@@ -368,7 +357,6 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
                 m_DownloadBlockCount = 0;
             }
         }
-
     }
 }
 //---------------------------------------------------------------------------
