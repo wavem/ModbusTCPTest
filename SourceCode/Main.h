@@ -141,6 +141,8 @@ public: // Download Functions
     unsigned short __fastcall GetCRCValue(BYTE* _pData, int _DataSize);
 	BYTE m_FileBuf[FILE_SAVE_BUF_SIZE];
     bool __fastcall SaveFile(int _Type, BYTE _CarID);
+    bool m_bIsFirstPacket;
+    int m_DownloadBlockCount;
 
 
 public: // SOCKET

@@ -96,6 +96,8 @@ void __fastcall TFormMain::InitProgram() {
     m_TotalDataBlockCount = 0;
     m_CurrentSaveIndex = 0;
     memset(m_FileBuf, 0, sizeof(m_FileBuf));
+    m_bIsFirstPacket = true;
+    m_DownloadBlockCount = 0;
 
 	// Init Socket
     if(InitSocket()) {
@@ -252,17 +254,17 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     BYTE* p_Buffer = (BYTE*)t_wParam;
     memcpy(m_RecvBuf, p_Buffer, t_BodySize);
 
+
+    //m_bIsFirstPacket
+
+
+
     // Print Received Packet Size
     //tempStr.sprintf(L"Packet Received (Size : %d)", t_BodySize);
     //PrintMsg(tempStr);
 
 
-    // Packet Count Test Temp Code
-    static int t_PacketCount = 0;
-    tempStr.sprintf(L"Count : %d", t_PacketCount++);
-    if(t_PacketCount % 100 == 0) {
-    	PrintMsg(tempStr);
-    }
+
 
 
     // Print Header
@@ -291,12 +293,26 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     // Get Car ID
     BYTE t_CarID = m_RecvBuf[3];
 
+    // Get Current Data Len (for Opdata Downloading Count)
+    BYTE t_CurrentDataLen = m_RecvBuf[6]; // For Opdata Download Counting
+
     // Get Total Data Block Count
     memcpy(&m_TotalDataBlockCount, &m_RecvBuf[4], 2);
     m_TotalDataBlockCount = ntohs(m_TotalDataBlockCount);
 
-    //tempStr.sprintf(L"Total Block Size : %d", m_TotalDataBlockCount);
-    //PrintMsg(tempStr);
+    // Print Download Block Count
+    //tempStr.sprintf(L"Download Count : %d0", m_DownloadBlockCount++);
+    m_DownloadBlockCount++;
+    if(m_DownloadBlockCount % 100 == 0) {
+    	tempStr.sprintf(L"Download %d/%d", m_DownloadBlockCount * 10, m_TotalDataBlockCount);
+    	PrintMsg(tempStr);
+    }
+
+    if(m_bIsFirstPacket) {
+        tempStr.sprintf(L"Total Count : %d", m_TotalDataBlockCount);
+    	PrintMsg(tempStr);
+        m_bIsFirstPacket = false;
+    }
 
     // Get Current Data Size
     unsigned short t_CurrentSize = m_RecvBuf[6];
@@ -330,6 +346,8 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
                 m_bIsNowDownloading = false;
                 m_StartIdx = 0;
                 m_CurrentSaveIndex = 0;
+                m_bIsFirstPacket = true;
+                m_DownloadBlockCount = 0;
             }
         }
     } else if(t_FCode == 0x66) {
@@ -346,6 +364,8 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
                 m_bIsNowDownloading = false;
                 m_StartIdx = 0;
                 m_CurrentSaveIndex = 0;
+                m_bIsFirstPacket = true;
+                m_DownloadBlockCount = 0;
             }
         }
 
