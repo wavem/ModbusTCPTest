@@ -1379,6 +1379,7 @@ object FormMain: TFormMain
     object MenuBtn_FaultDownload: TdxBarLargeButton
       Caption = 'Fault Download'
       Category = 0
+      Enabled = False
       Hint = 'Fault Download'
       Visible = ivAlways
       OnClick = MenuBtn_FaultDownloadClick
@@ -1518,6 +1519,7 @@ object FormMain: TFormMain
     object MenuBtn_OpdataDownload: TdxBarLargeButton
       Caption = 'Opdata Download'
       Category = 0
+      Enabled = False
       Hint = 'Opdata Download'
       Visible = ivAlways
       OnClick = MenuBtn_OpdataDownloadClick

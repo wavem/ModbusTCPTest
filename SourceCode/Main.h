@@ -155,6 +155,7 @@ public: // SOCKET
     BYTE m_RecvBuf[RECV_BUF_SIZE];
     bool __fastcall SendTestPacket();
     void __fastcall ExtractSendData();
+    bool m_bIsConnected;
 
 
 

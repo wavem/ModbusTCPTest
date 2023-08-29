@@ -98,6 +98,7 @@ void __fastcall TFormMain::InitProgram() {
     memset(m_FileBuf, 0, sizeof(m_FileBuf));
     m_bIsFirstPacket = true;
     m_DownloadBlockCount = 0;
+    m_bIsConnected = false;
 
 	// Init Socket
     if(InitSocket()) {
@@ -106,7 +107,8 @@ void __fastcall TFormMain::InitProgram() {
         }
     }
 
-	PrintMsg(L"Init Complete");
+	PrintMsg(L"Program Init Complete");
+    PrintMsg(L"Please Connect to TCMS");
 }
 //---------------------------------------------------------------------------
 

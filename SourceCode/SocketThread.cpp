@@ -68,6 +68,9 @@ void __fastcall CSocketThread::Execute() {
 				SendMessage(FormMain->Handle, MSG_LOG_FROM_THREAD, (unsigned int)&t_Str, 0x10);
 				isTryingToConnect = false;
 				isConnected = true;
+                FormMain->m_bIsConnected = true;
+                FormMain->MenuBtn_FaultDownload->Enabled = true;
+                FormMain->MenuBtn_OpdataDownload->Enabled = true;
 				break;
 			}
 		} else {
