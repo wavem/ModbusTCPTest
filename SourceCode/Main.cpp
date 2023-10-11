@@ -291,6 +291,10 @@ void __fastcall TFormMain::ReceiveServerData(TMessage &_msg) {
     // Get Total Data Block Count
     memcpy(&m_TotalDataBlockCount, &m_RecvBuf[4], 2);
     m_TotalDataBlockCount = ntohs(m_TotalDataBlockCount);
+    if(t_FCode == 0x66) { // Opdata Case : Block Count 가 최대값이 54000 인데, Modbus TCP Protocol에 2 바이트만 할당되어 있으므로, 받는 블럭카운트에 180을 곱해서 사용하기로 함 (2023-10-11 김훈 책임 왈)
+    	m_TotalDataBlockCount = m_TotalDataBlockCount * 180;
+    }
+
 
     // Print Download Block Count
     m_DownloadBlockCount++;
